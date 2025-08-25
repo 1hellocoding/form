@@ -482,7 +482,6 @@
                 const isEditing = index === editingGigIndex;
                 const gigCard = document.createElement('div');
                 
-                // **FIX**: Format date to MM/DD/YYYY
                 const dateObj = new Date(gig['Date'] + 'T00:00:00');
                 const formattedDate = dateObj.toLocaleDateString('en-US', {
                     month: '2-digit',
@@ -522,7 +521,7 @@
             document.getElementById('gig-date').value = '';
             document.getElementById('gig-date-display').textContent = 'Select a date...';
             gigForm.querySelectorAll('[required]').forEach(field => {
-                if (field.id !== 'band-name') { // Keep band name unless fully resetting
+                if (field.id !== 'band-name') {
                     const targetEl = document.getElementById(`${field.id}-display`) || field;
                     targetEl.classList.remove('border-red-500', 'ring-red-500');
                 }
@@ -539,14 +538,13 @@
             addToListBtn.classList.add('bg-slate-600', 'hover:bg-slate-700', 'focus:ring-slate-500');
             cancelEditBtn.classList.add('hidden');
             if (resetForm) partialResetForm();
-            renderStagedGigs(); // Re-render to remove highlight
+            renderStagedGigs();
         };
 
         const enterEditMode = (index) => {
             const gig = stagedGigs[index];
             if (!gig) return;
 
-            // Populate form
             document.getElementById('band-name').value = gig['Name'];
             document.getElementById('band-website').value = gig['Band Website'];
             document.getElementById('band-email').value = gig['Band Email'];
@@ -560,7 +558,6 @@
             document.getElementById('gig-time').value = gig['Time'];
             document.getElementById('gig-time-display').textContent = gig['Time'];
 
-            // Update UI for editing state
             editingGigIndex = index;
             addGigText.textContent = 'Update Gig in List';
             addGigIcon.className = 'fas fa-check-circle mr-2';
@@ -568,7 +565,7 @@
             addToListBtn.classList.add('bg-indigo-600', 'hover:bg-indigo-700', 'focus:ring-indigo-500');
             cancelEditBtn.classList.remove('hidden');
             
-            renderStagedGigs(); // Re-render to highlight the editing card
+            renderStagedGigs();
             document.getElementById('form-section').scrollIntoView({ behavior: 'smooth' });
         };
         
@@ -613,11 +610,10 @@
                 partialResetForm();
             }
 
-            // **FIX**: Scroll to the staged gigs list after adding/updating
             if (stagedGigs.length > 0) {
                 setTimeout(() => {
                     stagedGigsContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                }, 100);
+                }, 10);
             }
         });
 
@@ -761,7 +757,7 @@
                     }
                     addressSuggestionsContainer.innerHTML = skeletonHTML;
                     addressSuggestionsContainer.classList.remove('hidden');
-                }, 250);
+                }, 10);
                 const url = `${GIG_ENTRY_SCRIPT_URL}?action=autocompleteAddress&query=${encodeURIComponent(query)}&ip=${userIP || ''}`;
                 fetch(url, { signal: addressAbortController.signal })
                     .then(response => response.ok ? response.json() : Promise.reject(`Address lookup failed`))
@@ -797,7 +793,7 @@
                         addressSuggestionsContainer.classList.add('hidden');
                         if (error.name !== 'AbortError') console.error('Address lookup fetch failed:', error);
                     });
-            }, 150);
+            }, 10);
         });
         document.addEventListener('click', (e) => {
             if (!document.getElementById('address-container').contains(e.target)) {
