@@ -6,10 +6,10 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <title>Add Gig | My Bands Tonight</title>
-   
+    
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-   
+    
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -73,7 +73,7 @@
         }
         @keyframes slideDownFadeIn { from { transform: translateY(-30px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
         @keyframes slideUpFadeOut { from { transform: translateY(0); opacity: 1; } to { transform: translateY(-30px); opacity: 0; } }
-       
+        
         /* Custom Modal Styles */
         .modal-overlay {
             position: fixed;
@@ -167,6 +167,28 @@
             background: #4f46e5; color: white; border-color: #4f46e5;
         }
 
+        /* --- Skeleton Loader Styles --- */
+        .skeleton-item {
+            padding: 0.5rem 1rem; /* Mimics px-4 py-2 */
+            border-bottom: 1px solid #f1f5f9; /* slate-100 */
+        }
+        .skeleton-line {
+            height: 0.875rem; /* ~14px height for text line */
+            background-color: #e2e8f0; /* slate-200 */
+            border-radius: 0.25rem; /* rounded-sm */
+            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+        .skeleton-line.long {
+            width: 90%;
+            margin-bottom: 0.5rem; /* Space between the two lines */
+        }
+        .skeleton-line.short {
+            width: 60%;
+        }
+        @keyframes pulse {
+            50% { opacity: .5; }
+        }
+        
         /* Bottom navigation styling */
         #bottom-nav { flex-shrink: 0; padding-left: var(--safe-left); padding-right: var(--safe-right); padding-bottom: var(--safe-bottom); }
         .hamburger-line { transition: all 0.3s ease-in-out; }
@@ -193,26 +215,25 @@
 
         <div class="container mx-auto max-w-2xl px-4 pt-8 pb-12">
             <header class="text-center mb-10">
-                <h1 class="text-4xl font-bold tracking-tight text-slate-900 sm:text-5xl">Add a New Gig</h1>
-                <p class="mt-4 text-lg text-slate-600">Fill out the form below to add a new event to the calendar.</p>
+                <h1 class="text-4xl font-bold tracking-tight text-slate-900 sm:text-5xl">Add New Gigs</h1>
+                <p class="mt-4 text-lg text-slate-600">Fill out the form and add one or more gigs to a list, then submit them all at once.</p>
             </header>
-           
+            
             <div class="bg-white p-6 sm:p-8 rounded-xl shadow-lg border border-slate-200">
                 <form id="gig-entry-form" novalidate>
                     <div class="space-y-6">
-                       
-                        <!-- Band Details -->
+                        
                         <div>
                             <h2 class="text-lg font-semibold text-slate-800 border-b border-slate-200 pb-2 mb-4">Band Details</h2>
                             <div class="space-y-4">
                                 <div class="space-y-2">
                                     <label for="band-name" class="text-sm font-medium text-slate-700">Name</label>
-                                    <input type="text" id="band-name" required class="w-full px-4 py-2 bg-slate-50 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-shadow">
+                                    <input type="text" id="band-name" required class="w-full px-4 py-2 bg-slate-50 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-shadow" autocomplete="one-time-code">
                                 </div>
                                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
                                     <div class="space-y-2">
                                         <label for="band-website" class="text-sm font-medium text-slate-700">Band Website</label>
-                                        <input type="url" id="band-website" placeholder="https://example.com" class="w-full px-4 py-2 bg-slate-50 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-shadow">
+                                        <input type="url" id="band-website" placeholder="https://example.com" class="w-full px-4 py-2 bg-slate-50 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-shadow" autocomplete="one-time-code">
                                     </div>
                                     <div class="space-y-2">
                                         <label for="band-email" class="text-sm font-medium text-slate-700">Band Email</label>
@@ -222,25 +243,27 @@
                             </div>
                         </div>
 
-                        <!-- Venue Details -->
                         <div>
                             <h2 class="text-lg font-semibold text-slate-800 border-b border-slate-200 pb-2 mb-4">Venue Details</h2>
                             <div class="space-y-4">
                                 <div class="space-y-2">
                                     <label for="venue-name" class="text-sm font-medium text-slate-700">Venue Name</label>
-                                    <input type="text" id="venue-name" required class="w-full px-4 py-2 bg-slate-50 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-shadow">
+                                    <div id="venue-container" class="relative">
+                                        <input type="text" id="venue-name" required class="w-full px-4 py-2 bg-slate-50 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-shadow" autocomplete="one-time-code">
+                                        <div id="venue-suggestions" class="hidden absolute w-full bg-white border border-slate-300 rounded-lg mt-1 shadow-lg z-20 max-h-60 overflow-y-auto"></div>
+                                    </div>
                                 </div>
                                 <div class="space-y-2">
                                     <label for="venue-address" class="text-sm font-medium text-slate-700">Address</label>
                                     <div id="address-container" class="relative">
-                                        <input type="text" id="venue-address" required placeholder="Start typing an address..." class="w-full px-4 py-2 bg-slate-50 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-shadow" autocomplete="off">
+                                        <input type="text" id="venue-address" required placeholder="Start typing an address..." class="w-full px-4 py-2 bg-slate-50 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-shadow" autocomplete="one-time-code">
                                         <div id="address-suggestions" class="hidden absolute w-full bg-white border border-slate-300 rounded-lg mt-1 shadow-lg z-10 max-h-60 overflow-y-auto"></div>
                                     </div>
                                 </div>
                                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
                                     <div class="space-y-2">
                                         <label for="venue-website" class="text-sm font-medium text-slate-700">Venue Website</label>
-                                        <input type="url" id="venue-website" placeholder="https://venue.com" class="w-full px-4 py-2 bg-slate-50 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-shadow">
+                                        <input type="url" id="venue-website" placeholder="https://venue.com" class="w-full px-4 py-2 bg-slate-50 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-shadow" autocomplete="one-time-code">
                                     </div>
                                     <div class="space-y-2">
                                         <label for="venue-phone" class="text-sm font-medium text-slate-700">Venue Phone Number</label>
@@ -254,7 +277,6 @@
                             </div>
                         </div>
 
-                        <!-- Event Details -->
                         <div>
                              <h2 class="text-lg font-semibold text-slate-800 border-b border-slate-200 pb-2 mb-4">Event Details</h2>
                             <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
@@ -271,18 +293,44 @@
                             </div>
                         </div>
 
-                        <!-- Submit Button -->
-                        <div class="pt-4">
-                            <button type="submit" class="w-full py-3 px-5 bg-gradient-to-br from-blue-500 to-indigo-600 text-white font-semibold rounded-lg shadow-md hover:from-blue-600 hover:to-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-opacity-75 transition-all transform hover:scale-105">
-                                Add Gig to Calendar
+                        <div class="pt-2">
+                            <h3 class="text-base font-semibold text-slate-800 mb-3">Autofill Options</h3>
+                            <div class="flex items-center space-x-6 bg-slate-50 p-3 rounded-lg border border-slate-200">
+                                <label for="keep-venue-info" class="flex items-center cursor-pointer">
+                                    <input type="checkbox" id="keep-venue-info" class="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500">
+                                    <span class="ml-2 text-sm text-slate-700 font-medium">Keep Venue Info</span>
+                                </label>
+                                <label for="keep-time" class="flex items-center cursor-pointer">
+                                    <input type="checkbox" id="keep-time" class="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500">
+                                    <span class="ml-2 text-sm text-slate-700 font-medium">Keep Time</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="pt-4 space-y-4">
+                            <button type="button" id="add-gig-to-list-btn" class="w-full py-3 px-5 bg-slate-600 text-white font-semibold rounded-lg shadow-md hover:bg-slate-700 focus:outline-none focus:ring-2 focus:ring-slate-500 focus:ring-opacity-75 transition-all transform hover:scale-105">
+                                <i class="fas fa-plus mr-2"></i> Add Gig to List
                             </button>
                         </div>
                     </div>
                 </form>
             </div>
-        </div>
+            <div id="staged-gigs-container" class="mt-8 hidden">
+                <h2 class="text-2xl font-bold tracking-tight text-slate-900">Upcoming Gigs to Add</h2>
+                <p class="mt-2 text-md text-slate-600">Review your gigs below. You can remove any before submitting.</p>
+                <div id="staged-gigs-list" class="mt-4 space-y-3">
+                </div>
+                <div class="mt-6 flex flex-col sm:flex-row gap-4">
+                    <button id="submit-all-btn" class="w-full sm:w-auto flex-grow py-3 px-5 bg-gradient-to-br from-blue-500 to-indigo-600 text-white font-semibold rounded-lg shadow-md hover:from-blue-600 hover:to-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-opacity-75 transition-all transform hover:scale-105">
+                        Submit All Gigs
+                    </button>
+                    <button id="clear-list-btn" class="w-full sm:w-auto py-3 px-5 bg-red-500 text-white font-semibold rounded-lg shadow-md hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-opacity-75 transition-all">
+                        Clear List
+                    </button>
+                </div>
+            </div>
 
-        <!-- Custom Calendar Modal -->
+        </div>
         <div id="calendar-modal" class="modal-overlay">
             <div class="modal-content">
                 <div class="calendar">
@@ -299,7 +347,6 @@
             </div>
         </div>
 
-        <!-- Custom Time Picker Modal -->
         <div id="time-picker-modal" class="modal-overlay">
             <div class="modal-content">
                 <div class="time-picker">
@@ -320,7 +367,6 @@
         </div>
     </main>
 
-    <!-- Bottom Navigation Bar -->
     <div id="bottom-nav" class="bg-white/95 backdrop-blur-md border-t border-gray-200">
         <div class="flex items-center w-full px-4 py-2 gap-4">
             <div class="flex flex-1 items-center justify-center gap-2 min-w-0">
@@ -390,330 +436,120 @@
         const loadingOverlay = document.getElementById('loadingOverlay');
         const customAlert = document.getElementById('customAlert');
         let alertTimeout;
-        let userIP = null; // To store user's IP address
+        let userIP = null;
+        let stagedGigs = [];
+        let venueCache = []; // This will hold the FULL venue list for instant local search.
 
-        // --- Custom Alert Function ---
-        const showCustomAlert = (message, isError = false, duration = 4000) => {
-            clearTimeout(alertTimeout);
-            const alertBox = document.createElement('div');
-            alertBox.className = 'custom-alert-box';
-            alertBox.textContent = message;
-            if (isError) {
-                alertBox.style.background = 'linear-gradient(135deg, #ef4444, #dc2626)';
-            }
-            customAlert.innerHTML = '';
-            customAlert.appendChild(alertBox);
-            alertTimeout = setTimeout(() => {
-                alertBox.classList.add('fade-out');
-                alertBox.addEventListener('animationend', () => customAlert.contains(alertBox) && customAlert.removeChild(alertBox));
-            }, duration);
-        };
+        // --- Custom Alert Function (condensed) ---
+        const showCustomAlert = (message, isError = false, duration = 4000) => { clearTimeout(alertTimeout); const alertBox = document.createElement('div'); alertBox.className = 'custom-alert-box'; alertBox.textContent = message; if (isError) { alertBox.style.background = 'linear-gradient(135deg, #ef4444, #dc2626)'; } customAlert.innerHTML = ''; customAlert.appendChild(alertBox); alertTimeout = setTimeout(() => { alertBox.classList.add('fade-out'); alertBox.addEventListener('animationend', () => customAlert.contains(alertBox) && customAlert.removeChild(alertBox)); }, duration); };
         
         // --- IP Geolocation Logic ---
-        const getUserIP = () => {
-            fetch('https://api.ipify.org?format=json')
-                .then(response => response.json())
-                .then(data => {
-                    userIP = data.ip;
-                    console.log('User IP obtained for location-biased suggestions:', userIP);
-                })
-                .catch(error => {
-                    console.warn('Could not fetch IP address. Address search will work without location bias.', error);
-                });
-        };
+        const getUserIP = () => { fetch('https://api.ipify.org?format=json').then(response => response.json()).then(data => { userIP = data.ip; }).catch(error => { console.warn('Could not fetch IP address.', error); }); };
 
-        // --- Form Submission Logic ---
-        gigForm.addEventListener('submit', (e) => {
-            e.preventDefault();
-            let firstInvalidField = null;
-            gigForm.querySelectorAll('[required]').forEach(field => {
-                const isHiddenInput = field.type === 'hidden';
-                const displayId = isHiddenInput ? `${field.id}-display` : null;
-                const displayEl = displayId ? document.getElementById(displayId) : null;
+        // --- Gig List Management (condensed)---
+        const addToListBtn = document.getElementById('add-gig-to-list-btn'); const submitAllBtn = document.getElementById('submit-all-btn'); const clearListBtn = document.getElementById('clear-list-btn'); const stagedGigsContainer = document.getElementById('staged-gigs-container'); const stagedGigsList = document.getElementById('staged-gigs-list');
+        const renderStagedGigs = () => { stagedGigsList.innerHTML = ''; if (stagedGigs.length === 0) { stagedGigsContainer.classList.add('hidden'); return; } stagedGigsContainer.classList.remove('hidden'); submitAllBtn.textContent = `Submit ${stagedGigs.length} Gig(s)`; stagedGigs.forEach((gig, index) => { const gigElement = document.createElement('div'); gigElement.className = 'bg-slate-50 p-4 rounded-lg border border-slate-200 flex items-center justify-between'; gigElement.innerHTML = `<div><p class="font-semibold text-slate-800">${gig['Venue Name']}</p><p class="text-sm text-slate-600">${gig['Address']}</p><p class="text-sm text-slate-500 mt-1">${gig['Date']} at ${gig['Time']}</p></div><button data-index="${index}" class="remove-gig-btn text-red-500 hover:text-red-700 transition-colors p-2"><i class="fas fa-trash-alt fa-lg"></i></button>`; stagedGigsList.appendChild(gigElement); }); };
+        const partialResetForm = () => { const keepVenue = document.getElementById('keep-venue-info').checked; const keepTime = document.getElementById('keep-time').checked; if (!keepVenue) { ['venue-name', 'venue-address', 'venue-website', 'venue-phone', 'venue-email'].forEach(id => document.getElementById(id).value = ''); } if (!keepTime) { document.getElementById('gig-time').value = ''; document.getElementById('gig-time-display').textContent = 'Select a time...'; } document.getElementById('gig-date').value = ''; document.getElementById('gig-date-display').textContent = 'Select a date...'; gigForm.querySelectorAll('[required]').forEach(field => { if (field.id !== 'band-name') { const targetEl = document.getElementById(`${field.id}-display`) || field; targetEl.classList.remove('border-red-500', 'ring-red-500'); } }); if (!keepVenue) document.getElementById('venue-name').focus(); else document.getElementById('gig-date-display').focus(); };
+        addToListBtn.addEventListener('click', () => { let firstInvalidField = null, isValid = true; gigForm.querySelectorAll('[required]').forEach(field => { const targetEl = document.getElementById(`${field.id}-display`) || field; if (!field.value.trim()) { targetEl.classList.add('border-red-500', 'ring-red-500'); if (!firstInvalidField) firstInvalidField = targetEl; isValid = false; } else { targetEl.classList.remove('border-red-500', 'ring-red-500'); } }); if (!isValid) { showCustomAlert('Please fill out all required fields.', true); firstInvalidField.focus(); return; } const gigData = { 'Name': document.getElementById('band-name').value.trim(), 'Band Website': document.getElementById('band-website').value.trim(), 'Band Email': document.getElementById('band-email').value.trim(), 'Venue Name': document.getElementById('venue-name').value.trim(), 'Address': document.getElementById('venue-address').value.trim(), 'Venue Website': document.getElementById('venue-website').value.trim(), 'Venue Phone Number': document.getElementById('venue-phone').value.trim(), 'Venue Email': document.getElementById('venue-email').value.trim(), 'Date': document.getElementById('gig-date').value, 'Time': document.getElementById('gig-time').value }; stagedGigs.push(gigData); showCustomAlert('Gig added to the list!'); renderStagedGigs(); partialResetForm(); });
+        stagedGigsList.addEventListener('click', (e) => { const removeBtn = e.target.closest('.remove-gig-btn'); if (removeBtn) { stagedGigs.splice(parseInt(removeBtn.dataset.index, 10), 1); renderStagedGigs(); showCustomAlert('Gig removed from the list.'); } });
+        submitAllBtn.addEventListener('click', () => { if (stagedGigs.length === 0) return showCustomAlert('There are no gigs in the list to submit.', true); submitAllBtn.disabled = true; submitAllBtn.textContent = 'Submitting...'; fetch(GIG_ENTRY_SCRIPT_URL, { method: 'POST', body: JSON.stringify(stagedGigs), headers: { 'Content-Type': 'text/plain;charset=utf-8' } }).then(res => res.ok ? res.json() : Promise.reject(`Network error: ${res.statusText}`)).then(data => { if (data.result !== 'success') throw new Error(data.error || 'Unknown script error.'); gigForm.reset(); partialResetForm(); stagedGigs = []; renderStagedGigs(); showCustomAlert(`${data.count || 'All'} gigs added successfully!`); }).catch(error => { showCustomAlert(`Error: ${error.message}`, true); }).finally(() => { submitAllBtn.disabled = false; renderStagedGigs(); }); });
+        clearListBtn.addEventListener('click', () => { if (stagedGigs.length > 0) { stagedGigs = []; renderStagedGigs(); showCustomAlert('List cleared.', false, 2000); } });
 
-                if (!field.value.trim()) {
-                    const targetEl = displayEl || field;
-                    targetEl.classList.add('border-red-500', 'ring-red-500');
-                    if (!firstInvalidField) firstInvalidField = targetEl;
-                } else {
-                    const targetEl = displayEl || field;
-                    targetEl.classList.remove('border-red-500', 'ring-red-500');
-                }
-            });
+        // --- Intelligent search logic (condensed) ---
+        const normalizeString = (str) => !str ? '' : str.toLowerCase().replace(/\b(the|a|an)\b/g, '').replace(/[\s\W_]+/g, '');
+        const venueInput = document.getElementById('venue-name');
+        const venueSuggestionsContainer = document.getElementById('venue-suggestions');
+        const fetchVenues = () => { fetch(`${GIG_ENTRY_SCRIPT_URL}?action=getVenues`).then(res => res.ok ? res.json() : Promise.reject('Failed to fetch venues.')).then(json => { if (json.result === 'success') { venueCache = json.data; console.log(`✅ Instantly ready with ${venueCache.length} cached venues.`); } else { throw new Error(json.error); } }).catch(error => console.error('❌ Could not fetch venue list:', error)); };
+        venueInput.addEventListener('input', () => { const query = venueInput.value; venueSuggestionsContainer.innerHTML = ''; if (query.length < 2 || venueCache.length === 0) { venueSuggestionsContainer.classList.add('hidden'); return; } const normalizedQuery = normalizeString(query); const filteredVenues = venueCache.filter(venue => normalizeString(venue.name).includes(normalizedQuery)).slice(0, 7); if (filteredVenues.length > 0) { filteredVenues.forEach(venue => { const suggestionDiv = document.createElement('div'); suggestionDiv.innerHTML = `<div class="font-medium text-slate-800">${venue.name}</div><div class="text-sm text-slate-500">${venue.address}</div>`; suggestionDiv.className = 'px-4 py-2 hover:bg-slate-100 cursor-pointer border-b border-slate-100 last:border-b-0'; suggestionDiv.addEventListener('click', () => { document.getElementById('venue-name').value = venue.name || ''; document.getElementById('venue-address').value = venue.address || ''; document.getElementById('venue-website').value = venue.website || ''; document.getElementById('venue-phone').value = venue.phone || ''; document.getElementById('venue-email').value = venue.email || ''; venueSuggestionsContainer.classList.add('hidden'); document.getElementById('gig-date-display').focus(); }); venueSuggestionsContainer.appendChild(suggestionDiv); }); venueSuggestionsContainer.classList.remove('hidden'); } else { venueSuggestionsContainer.classList.add('hidden'); } });
+        document.addEventListener('click', (e) => { if (!document.getElementById('venue-container').contains(e.target)) venueSuggestionsContainer.classList.add('hidden'); });
 
-            if (firstInvalidField) {
-                showCustomAlert('Please fill out all required fields.', true);
-                firstInvalidField.focus();
-                return;
-            }
-
-            if (GIG_ENTRY_SCRIPT_URL.includes("YOUR_SCRIPT_ID_HERE")) {
-                 showCustomAlert('Demo Mode: Please replace the placeholder script URL.', true, 5000);
-                 return;
-            }
-
-            const submitButton = e.target.querySelector('button[type="submit"]');
-            submitButton.disabled = true;
-            submitButton.textContent = 'Submitting...';
-            
-            const formData = {
-                'Name': document.getElementById('band-name').value.trim(),
-                'Band Website': document.getElementById('band-website').value.trim(),
-                'Band Email': document.getElementById('band-email').value.trim(),
-                'Venue Name': document.getElementById('venue-name').value.trim(),
-                'Address': document.getElementById('venue-address').value.trim(),
-                'Venue Website': document.getElementById('venue-website').value.trim(),
-                'Venue Phone Number': document.getElementById('venue-phone').value.trim(),
-                'Venue Email': document.getElementById('venue-email').value.trim(),
-                'Date': document.getElementById('gig-date').value,
-                'Time': document.getElementById('gig-time').value
-            };
-
-            fetch(GIG_ENTRY_SCRIPT_URL, {
-                method: 'POST',
-                body: JSON.stringify(formData),
-                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-            })
-            .then(res => res.ok ? res.json() : Promise.reject(`Network error: ${res.statusText}`))
-            .then(data => {
-                if (data.result !== 'success') throw new Error(data.error || 'Unknown script error.');
-                gigForm.reset();
-                document.getElementById('gig-date-display').textContent = 'Select a date...';
-                document.getElementById('gig-time-display').textContent = 'Select a time...';
-                selectedHour = null;
-                selectedMinute = null;
-                selectedAmPm = null;
-                showCustomAlert('Gig added successfully!');
-            })
-            .catch(error => {
-                console.error('Submission failed:', error);
-                showCustomAlert(`Error: ${error.message}`, true);
-            })
-            .finally(() => {
-                submitButton.disabled = false;
-                submitButton.textContent = 'Add Gig to Calendar';
-            });
-        });
-
-        // --- Address Autocomplete Logic (Advanced) ---
+        // --- MODIFIED: Address Autocomplete with Skeleton Loader and 20ms Delay ---
         const addressInput = document.getElementById('venue-address');
-        const suggestionsContainer = document.getElementById('address-suggestions');
-        let debounceTimer;
-        let autocompleteAbortController; // To cancel pending requests
+        const addressSuggestionsContainer = document.getElementById('address-suggestions');
+        let addressDebounceTimer;
+        let addressAbortController;
 
         addressInput.addEventListener('input', () => {
-            clearTimeout(debounceTimer);
+            clearTimeout(addressDebounceTimer);
             const query = addressInput.value;
-
-            // Abort the previous fetch request if it's still in flight
-            if (autocompleteAbortController) {
-                autocompleteAbortController.abort();
-            }
-
+            if (addressAbortController) { addressAbortController.abort(); }
+            
             if (query.length < 3) {
-                suggestionsContainer.classList.add('hidden');
+                addressSuggestionsContainer.classList.add('hidden');
                 return;
             }
 
-            debounceTimer = setTimeout(() => {
-                if (GIG_ENTRY_SCRIPT_URL.includes("YOUR_SCRIPT_ID_HERE")) {
-                    console.log("Address search disabled: Add your script URL.");
-                    return;
-                }
-                
-                // Create a new AbortController for this specific request
-                autocompleteAbortController = new AbortController();
-                const signal = autocompleteAbortController.signal;
+            addressDebounceTimer = setTimeout(() => {
+                // Show skeleton loader
+                addressSuggestionsContainer.innerHTML = `
+                    <div class="skeleton-item"><div class="skeleton-line long"></div><div class="skeleton-line short"></div></div>
+                    <div class="skeleton-item"><div class="skeleton-line long"></div><div class="skeleton-line short"></div></div>
+                    <div class="skeleton-item"><div class="skeleton-line long"></div><div class="skeleton-line short"></div></div>
+                `;
+                addressSuggestionsContainer.classList.remove('hidden');
 
-                let url = `${GIG_ENTRY_SCRIPT_URL}?action=autocompleteAddress&query=${encodeURIComponent(query)}`;
-                if (userIP) {
-                    url += `&ip=${userIP}`;
-                }
+                addressAbortController = new AbortController();
+                const url = `${GIG_ENTRY_SCRIPT_URL}?action=autocompleteAddress&query=${encodeURIComponent(query)}&ip=${userIP || ''}`;
                 
-                fetch(url, { signal }) // Pass the signal to fetch
-                    .then(response => response.ok ? response.json() : Promise.reject(`Network response was not ok: ${response.statusText}`))
+                fetch(url, { signal: addressAbortController.signal })
+                    .then(response => response.ok ? response.json() : Promise.reject(`Address lookup failed`))
                     .then(data => {
-                        if (data.error) {
-                            console.error('Address lookup error from script:', data.error);
-                            if (data.error.includes("API key")) {
-                                showCustomAlert('Address search is not configured. Please add API key to the script.', true);
-                            }
-                            return;
+                        addressSuggestionsContainer.innerHTML = ''; // Clear skeletons
+                        if (data.features && data.features.length > 0) {
+                            data.features.forEach(feature => {
+                                const props = feature.properties;
+                                if (props.address_line1 && props.address_line2) {
+                                    const suggestionDiv = document.createElement('div');
+                                    suggestionDiv.className = 'px-4 py-2 hover:bg-slate-100 cursor-pointer border-b border-slate-100 last:border-b-0';
+                                    suggestionDiv.innerHTML = `<div class="font-medium text-slate-800">${props.address_line1}</div><div class="text-sm text-slate-500">${props.address_line2}</div>`;
+                                    suggestionDiv.addEventListener('click', () => {
+                                        addressInput.value = props.formatted;
+                                        addressSuggestionsContainer.classList.add('hidden');
+                                    });
+                                    addressSuggestionsContainer.appendChild(suggestionDiv);
+                                }
+                            });
                         }
-                        displayAddressSuggestions(data.features);
+                        if (addressSuggestionsContainer.childElementCount === 0) {
+                            addressSuggestionsContainer.classList.add('hidden');
+                        }
                     })
                     .catch(error => {
-                        if (error.name === 'AbortError') {
-                            // This was a deliberate cancellation of the previous request, so we can ignore it.
-                            console.log('Fetch aborted for outdated address query.');
-                        } else {
+                        if (error.name !== 'AbortError') {
                             console.error('Address lookup fetch failed:', error);
-                            suggestionsContainer.classList.add('hidden');
+                            addressSuggestionsContainer.innerHTML = '';
+                            addressSuggestionsContainer.classList.add('hidden');
                         }
                     });
-            }, 10); // 10ms delay
+            }, 20); // <-- Delay set to 20ms
         });
-
-        function displayAddressSuggestions(features) {
-            suggestionsContainer.innerHTML = '';
-            if (!features || features.length === 0) {
-                suggestionsContainer.classList.add('hidden');
-                return;
-            }
-
-            features.forEach(feature => {
-                const suggestionDiv = document.createElement('div');
-                const props = feature.properties;
-                
-                const houseNumber = props.housenumber || '';
-                const street = props.street || '';
-                const primaryText = `${houseNumber} ${street}`.trim();
-                const secondaryText = props.address_line2;
-
-                suggestionDiv.innerHTML = `
-                    <div class="font-medium text-slate-800">${primaryText || props.formatted}</div>
-                    <div class="text-sm text-slate-500">${secondaryText}</div>
-                `;
-                suggestionDiv.className = 'px-4 py-2 hover:bg-slate-100 cursor-pointer border-b border-slate-100 last:border-b-0';
-                
-                suggestionDiv.addEventListener('click', () => {
-                    addressInput.value = props.formatted;
-                    suggestionsContainer.classList.add('hidden');
-                });
-                suggestionsContainer.appendChild(suggestionDiv);
-            });
-
-            suggestionsContainer.classList.remove('hidden');
-        }
-
+        
         document.addEventListener('click', (e) => {
             if (!document.getElementById('address-container').contains(e.target)) {
-                suggestionsContainer.classList.add('hidden');
+                addressSuggestionsContainer.classList.add('hidden');
             }
         });
-
-
-        // --- Custom Calendar Logic ---
-        const calendarModal = document.getElementById('calendar-modal');
-        const dateDisplay = document.getElementById('gig-date-display');
-        const dateInput = document.getElementById('gig-date');
-        const monthYearDisplay = document.getElementById('month-year-display');
-        const calendarDaysGrid = document.getElementById('calendar-days-grid');
-        const prevMonthBtn = document.getElementById('prev-month-btn');
-        const nextMonthBtn = document.getElementById('next-month-btn');
-        let calendarDate = new Date();
-        let selectedDate = null;
-
-        const buildCalendar = (year, month) => {
-            calendarDaysGrid.innerHTML = "";
-            monthYearDisplay.textContent = `${new Date(year, month).toLocaleString("default", { month: "long" })} ${year}`;
-            const firstDay = new Date(year, month, 1).getDay();
-            const daysInMonth = new Date(year, month + 1, 0).getDate();
-            const today = new Date();
-            for (let i = 0; i < firstDay; i++) {
-                const emptyCell = document.createElement("div");
-                emptyCell.className = "day empty";
-                calendarDaysGrid.appendChild(emptyCell);
-            }
-            for (let day = 1; day <= daysInMonth; day++) {
-                const cell = document.createElement("div");
-                cell.className = "day";
-                cell.textContent = day;
-                const cellDate = new Date(year, month, day);
-                if (selectedDate && cellDate.toDateString() === selectedDate.toDateString()) {
-                    cell.classList.add("selected");
-                }
-                if (cellDate.toDateString() === today.toDateString()) {
-                    cell.classList.add("today");
-                }
-                cell.addEventListener('click', () => {
-                    selectedDate = cellDate;
-                    dateInput.value = selectedDate.toISOString().split('T')[0];
-                    dateDisplay.textContent = selectedDate.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
-                    dateDisplay.classList.remove('border-red-500', 'ring-red-500');
-                    calendarModal.classList.remove('visible');
-                });
-                calendarDaysGrid.appendChild(cell);
-            }
-        };
-
-        dateDisplay.addEventListener('click', () => calendarModal.classList.add('visible'));
-        calendarModal.addEventListener('click', (e) => e.target === calendarModal && calendarModal.classList.remove('visible'));
-        prevMonthBtn.addEventListener('click', () => { calendarDate.setMonth(calendarDate.getMonth() - 1); buildCalendar(calendarDate.getFullYear(), calendarDate.getMonth()); });
-        nextMonthBtn.addEventListener('click', () => { calendarDate.setMonth(calendarDate.getMonth() + 1); buildCalendar(calendarDate.getFullYear(), calendarDate.getMonth()); });
-        buildCalendar(calendarDate.getFullYear(), calendarDate.getMonth());
-
-        // --- Custom Time Picker Logic ---
-        const timePickerModal = document.getElementById('time-picker-modal');
-        const timeDisplay = document.getElementById('gig-time-display');
-        const timeInput = document.getElementById('gig-time');
-        const hourInput = document.getElementById('time-hour');
-        const minuteInput = document.getElementById('time-minute');
-        const amBtn = document.getElementById('time-am');
-        const pmBtn = document.getElementById('time-pm');
-        const setTimeBtn = document.getElementById('set-time-btn');
-        let selectedHour = null, selectedMinute = null, selectedAmPm = null;
-
-        const formatTime = (hour, minute, ampm) => `${String(hour)}:${String(minute).padStart(2, '0')} ${ampm}`;
-
-        timeDisplay.addEventListener('click', () => {
-            if (selectedHour !== null && selectedMinute !== null && selectedAmPm !== null) {
-                hourInput.value = selectedHour;
-                minuteInput.value = String(selectedMinute).padStart(2, '0');
-                if (selectedAmPm === 'PM') { pmBtn.classList.add('active'); amBtn.classList.remove('active'); } 
-                else { amBtn.classList.add('active'); pmBtn.classList.remove('active'); }
-            } else {
-                const now = new Date();
-                hourInput.value = now.getHours() % 12 || 12;
-                minuteInput.value = String(now.getMinutes()).padStart(2, '0');
-                if (now.getHours() >= 12) { pmBtn.classList.add('active'); amBtn.classList.remove('active'); } 
-                else { amBtn.classList.add('active'); pmBtn.classList.remove('active'); }
-            }
-            timePickerModal.classList.add('visible');
-        });
-
-        amBtn.addEventListener('click', () => { amBtn.classList.add('active'); pmBtn.classList.remove('active'); });
-        pmBtn.addEventListener('click', () => { pmBtn.classList.add('active'); amBtn.classList.remove('active'); });
         
-        [hourInput, minuteInput].forEach(input => {
-            input.addEventListener('keydown', (e) => {
-                if ([46, 8, 9, 27, 13, 37, 39].indexOf(e.keyCode) !== -1 || (e.keyCode === 65 && (e.ctrlKey === true || e.metaKey === true)) || (e.keyCode >= 35 && e.keyCode <= 40)) { return; }
-                if ((e.shiftKey || (e.keyCode < 48 || e.keyCode > 57)) && (e.keyCode < 96 || e.keyCode > 105)) { e.preventDefault(); }
-            });
-            input.addEventListener('input', () => {
-                let val = parseInt(input.value), min = parseInt(input.min), max = parseInt(input.max);
-                if (isNaN(val)) { input.value = ''; return; };
-                if (val < min) input.value = min;
-                if (val > max) input.value = max;
-            });
-        });
-
-        setTimeBtn.addEventListener('click', () => {
-            const hour = parseInt(hourInput.value), minute = parseInt(minuteInput.value), ampm = amBtn.classList.contains('active') ? 'AM' : 'PM';
-            if (isNaN(hour) || isNaN(minute)) {
-                showCustomAlert('Please enter a valid time.', true);
-                return;
-            }
-            selectedHour = hour; selectedMinute = minute; selectedAmPm = ampm;
-            const formattedTime = formatTime(hour, minute, ampm);
-            timeInput.value = formattedTime;
-            timeDisplay.textContent = formattedTime;
-            timeDisplay.classList.remove('border-red-500', 'ring-red-500');
-            timePickerModal.classList.remove('visible');
-        });
-
+        // --- Custom Calendar & Time Picker Logic (Condensed) ---
+        const calendarModal = document.getElementById('calendar-modal'); const dateDisplay = document.getElementById('gig-date-display'); const dateInput = document.getElementById('gig-date'); const monthYearDisplay = document.getElementById('month-year-display'); const calendarDaysGrid = document.getElementById('calendar-days-grid'); const prevMonthBtn = document.getElementById('prev-month-btn'); const nextMonthBtn = document.getElementById('next-month-btn'); let calendarDate = new Date(); let selectedDate = null;
+        const buildCalendar = (year, month) => { calendarDaysGrid.innerHTML = ""; monthYearDisplay.textContent = `${new Date(year, month).toLocaleString("default", { month: "long" })} ${year}`; const firstDay = new Date(year, month, 1).getDay(); const daysInMonth = new Date(year, month + 1, 0).getDate(); const today = new Date(); for (let i = 0; i < firstDay; i++) { calendarDaysGrid.appendChild(Object.assign(document.createElement("div"), { className: "day empty" })); } for (let day = 1; day <= daysInMonth; day++) { const cell = document.createElement("div"); cell.className = "day"; cell.textContent = day; const cellDate = new Date(year, month, day); if (selectedDate && cellDate.toDateString() === selectedDate.toDateString()) { cell.classList.add("selected"); } if (cellDate.toDateString() === today.toDateString()) { cell.classList.add("today"); } cell.addEventListener('click', () => { selectedDate = cellDate; dateInput.value = selectedDate.toISOString().split('T')[0]; dateDisplay.textContent = selectedDate.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }); dateDisplay.classList.remove('border-red-500', 'ring-red-500'); calendarModal.classList.remove('visible'); }); calendarDaysGrid.appendChild(cell); } };
+        dateDisplay.addEventListener('click', () => calendarModal.classList.add('visible')); calendarModal.addEventListener('click', (e) => e.target === calendarModal && calendarModal.classList.remove('visible')); prevMonthBtn.addEventListener('click', () => { calendarDate.setMonth(calendarDate.getMonth() - 1); buildCalendar(calendarDate.getFullYear(), calendarDate.getMonth()); }); nextMonthBtn.addEventListener('click', () => { calendarDate.setMonth(calendarDate.getMonth() + 1); buildCalendar(calendarDate.getFullYear(), calendarDate.getMonth()); });
+        const timePickerModal = document.getElementById('time-picker-modal'); const timeDisplay = document.getElementById('gig-time-display'); const timeInput = document.getElementById('gig-time'); const hourInput = document.getElementById('time-hour'); const minuteInput = document.getElementById('time-minute'); const amBtn = document.getElementById('time-am'); const pmBtn = document.getElementById('time-pm'); const setTimeBtn = document.getElementById('set-time-btn'); let selectedHour = null, selectedMinute = null, selectedAmPm = null; const formatTime = (h, m, ampm) => `${String(h)}:${String(m).padStart(2, '0')} ${ampm}`;
+        timeDisplay.addEventListener('click', () => { const now = new Date(); hourInput.value = selectedHour !== null ? selectedHour : now.getHours() % 12 || 12; minuteInput.value = selectedMinute !== null ? String(selectedMinute).padStart(2, '0') : String(now.getMinutes()).padStart(2, '0'); const currentAmPm = selectedAmPm !== null ? selectedAmPm : (now.getHours() >= 12 ? 'PM' : 'AM'); if(currentAmPm === 'PM') { pmBtn.classList.add('active'); amBtn.classList.remove('active'); } else { amBtn.classList.add('active'); pmBtn.classList.remove('active'); } timePickerModal.classList.add('visible'); });
+        amBtn.addEventListener('click', () => { amBtn.classList.add('active'); pmBtn.classList.remove('active'); }); pmBtn.addEventListener('click', () => { pmBtn.classList.add('active'); amBtn.classList.remove('active'); }); [hourInput, minuteInput].forEach(input => { input.addEventListener('input', () => { let val = parseInt(input.value), min = parseInt(input.min), max = parseInt(input.max); if (val < min) input.value = min; if (val > max) input.value = max; }); });
+        setTimeBtn.addEventListener('click', () => { const hour = parseInt(hourInput.value), minute = parseInt(minuteInput.value), ampm = amBtn.classList.contains('active') ? 'AM' : 'PM'; if (isNaN(hour) || isNaN(minute)) { showCustomAlert('Please enter a valid time.', true); return; } selectedHour = hour; selectedMinute = minute; selectedAmPm = ampm; const formattedTime = formatTime(hour, minute, ampm); timeInput.value = formattedTime; timeDisplay.textContent = formattedTime; timeDisplay.classList.remove('border-red-500', 'ring-red-500'); timePickerModal.classList.remove('visible'); });
         timePickerModal.addEventListener('click', (e) => e.target === timePickerModal && timePickerModal.classList.remove('visible'));
 
         // --- Menu Bar Logic ---
-        const menuButton = document.getElementById('menu-button');
-        const contactMenu = document.getElementById('contact-menu');
-        const hamburgerIcon = document.getElementById('hamburger-icon');
+        const menuButton = document.getElementById('menu-button'); const contactMenu = document.getElementById('contact-menu'); const hamburgerIcon = document.getElementById('hamburger-icon');
         menuButton.addEventListener('click', (e) => { e.stopPropagation(); contactMenu.classList.toggle('hidden'); hamburgerIcon.classList.toggle('open'); });
         document.addEventListener('click', (e) => { if (!contactMenu.classList.contains('hidden') && !menuButton.contains(e.target)) { contactMenu.classList.add('hidden'); hamburgerIcon.classList.remove('open'); } });
 
         // --- App Initialization ---
         const initializeApp = () => {
-            getUserIP(); // Get user IP for location-biased suggestions
+            getUserIP();
+            fetchVenues();
+            buildCalendar(calendarDate.getFullYear(), calendarDate.getMonth());
             const minDelayPromise = new Promise(resolve => setTimeout(resolve, 500));
             minDelayPromise.then(() => {
                 loadingOverlay.style.opacity = '0';
