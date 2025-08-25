@@ -167,28 +167,6 @@
             background: #4f46e5; color: white; border-color: #4f46e5;
         }
 
-        /* --- Skeleton Loader Styles --- */
-        .skeleton-item {
-            padding: 0.5rem 1rem; /* Mimics px-4 py-2 */
-            border-bottom: 1px solid #f1f5f9; /* slate-100 */
-        }
-        .skeleton-line {
-            height: 0.875rem; /* ~14px height for text line */
-            background-color: #e2e8f0; /* slate-200 */
-            border-radius: 0.25rem; /* rounded-sm */
-            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-        }
-        .skeleton-line.long {
-            width: 90%;
-            margin-bottom: 0.5rem; /* Space between the two lines */
-        }
-        .skeleton-line.short {
-            width: 60%;
-        }
-        @keyframes pulse {
-            50% { opacity: .5; }
-        }
-        
         /* Bottom navigation styling */
         #bottom-nav { flex-shrink: 0; padding-left: var(--safe-left); padding-right: var(--safe-right); padding-bottom: var(--safe-bottom); }
         .hamburger-line { transition: all 0.3s ease-in-out; }
@@ -205,6 +183,35 @@
         .loading-text { font-size: 1.5em; color: #3b82f6; font-weight: bold; letter-spacing: 2px; }
         @media (max-width: 768px) { .loading-image-container { width: 90vw; height: 45vw; } }
 
+        /* Skeleton Loader for Address Suggestions */
+        .skeleton-suggestion {
+            padding: 8px 16px; /* A bit tighter padding than real items */
+            border-bottom: 1px solid #f1f5f9; /* slate-100 */
+        }
+        .skeleton-suggestion:last-child {
+            border-bottom: none;
+        }
+        .skeleton-line {
+            height: 12px;
+            background-color: #e2e8f0; /* slate-200 */
+            border-radius: 4px;
+            position: relative;
+            overflow: hidden;
+        }
+        .skeleton-line.primary { width: 80%; }
+        .skeleton-line.secondary { width: 60%; height: 10px; margin-top: 8px; }
+        .skeleton-line::after {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.6), transparent);
+            transform: translateX(-100%);
+            animation: shimmer-suggestion 1.5s infinite;
+        }
+        @keyframes shimmer-suggestion {
+            100% { transform: translateX(100%); }
+        }
+
     </style>
 </head>
 <body>
@@ -219,7 +226,7 @@
                 <p class="mt-4 text-lg text-slate-600">Fill out the form and add one or more gigs to a list, then submit them all at once.</p>
             </header>
             
-            <div class="bg-white p-6 sm:p-8 rounded-xl shadow-lg border border-slate-200">
+            <div id="form-section" class="bg-white p-6 sm:p-8 rounded-xl shadow-lg border border-slate-200">
                 <form id="gig-entry-form" novalidate>
                     <div class="space-y-6">
                         
@@ -228,12 +235,12 @@
                             <div class="space-y-4">
                                 <div class="space-y-2">
                                     <label for="band-name" class="text-sm font-medium text-slate-700">Name</label>
-                                    <input type="text" id="band-name" required class="w-full px-4 py-2 bg-slate-50 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-shadow" autocomplete="one-time-code">
+                                    <input type="text" id="band-name" required class="w-full px-4 py-2 bg-slate-50 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-shadow">
                                 </div>
                                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
                                     <div class="space-y-2">
                                         <label for="band-website" class="text-sm font-medium text-slate-700">Band Website</label>
-                                        <input type="url" id="band-website" placeholder="https://example.com" class="w-full px-4 py-2 bg-slate-50 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-shadow" autocomplete="one-time-code">
+                                        <input type="url" id="band-website" placeholder="https://example.com" class="w-full px-4 py-2 bg-slate-50 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-shadow">
                                     </div>
                                     <div class="space-y-2">
                                         <label for="band-email" class="text-sm font-medium text-slate-700">Band Email</label>
@@ -249,21 +256,21 @@
                                 <div class="space-y-2">
                                     <label for="venue-name" class="text-sm font-medium text-slate-700">Venue Name</label>
                                     <div id="venue-container" class="relative">
-                                        <input type="text" id="venue-name" required class="w-full px-4 py-2 bg-slate-50 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-shadow" autocomplete="one-time-code">
+                                        <input type="text" id="venue-name" required class="w-full px-4 py-2 bg-slate-50 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-shadow" autocomplete="off">
                                         <div id="venue-suggestions" class="hidden absolute w-full bg-white border border-slate-300 rounded-lg mt-1 shadow-lg z-20 max-h-60 overflow-y-auto"></div>
                                     </div>
                                 </div>
                                 <div class="space-y-2">
                                     <label for="venue-address" class="text-sm font-medium text-slate-700">Address</label>
                                     <div id="address-container" class="relative">
-                                        <input type="text" id="venue-address" required placeholder="Start typing an address..." class="w-full px-4 py-2 bg-slate-50 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-shadow" autocomplete="one-time-code">
+                                        <input type="text" id="venue-address" required placeholder="Start typing an address..." class="w-full px-4 py-2 bg-slate-50 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-shadow" autocomplete="off">
                                         <div id="address-suggestions" class="hidden absolute w-full bg-white border border-slate-300 rounded-lg mt-1 shadow-lg z-10 max-h-60 overflow-y-auto"></div>
                                     </div>
                                 </div>
                                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
                                     <div class="space-y-2">
                                         <label for="venue-website" class="text-sm font-medium text-slate-700">Venue Website</label>
-                                        <input type="url" id="venue-website" placeholder="https://venue.com" class="w-full px-4 py-2 bg-slate-50 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-shadow" autocomplete="one-time-code">
+                                        <input type="url" id="venue-website" placeholder="https://venue.com" class="w-full px-4 py-2 bg-slate-50 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-shadow">
                                     </div>
                                     <div class="space-y-2">
                                         <label for="venue-phone" class="text-sm font-medium text-slate-700">Venue Phone Number</label>
@@ -308,18 +315,23 @@
                         </div>
 
                         <div class="pt-4 space-y-4">
-                            <button type="button" id="add-gig-to-list-btn" class="w-full py-3 px-5 bg-slate-600 text-white font-semibold rounded-lg shadow-md hover:bg-slate-700 focus:outline-none focus:ring-2 focus:ring-slate-500 focus:ring-opacity-75 transition-all transform hover:scale-105">
-                                <i class="fas fa-plus mr-2"></i> Add Gig to List
-                            </button>
+                             <div class="flex flex-col sm:flex-row gap-4">
+                                <button type="button" id="add-gig-to-list-btn" class="w-full flex-grow py-3 px-5 bg-slate-600 text-white font-semibold rounded-lg shadow-md hover:bg-slate-700 focus:outline-none focus:ring-2 focus:ring-slate-500 focus:ring-opacity-75 transition-all transform hover:scale-105 flex items-center justify-center">
+                                    <i id="add-gig-icon" class="fas fa-plus mr-2"></i> <span id="add-gig-text">Add Gig to List</span>
+                                </button>
+                                <button type="button" id="cancel-edit-btn" class="w-full sm:w-auto hidden py-3 px-5 bg-gray-200 text-slate-700 font-semibold rounded-lg hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-400 transition-all">
+                                    Cancel Edit
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </form>
             </div>
-            <div id="staged-gigs-container" class="mt-8 hidden">
+            <div id="staged-gigs-container" class="mt-12 hidden">
                 <h2 class="text-2xl font-bold tracking-tight text-slate-900">Upcoming Gigs to Add</h2>
-                <p class="mt-2 text-md text-slate-600">Review your gigs below. You can remove any before submitting.</p>
-                <div id="staged-gigs-list" class="mt-4 space-y-3">
-                </div>
+                <p class="mt-2 text-md text-slate-600">Review your gigs below. You can edit or remove any before submitting.</p>
+                <div id="staged-gigs-list" class="mt-6 space-y-4">
+                    </div>
                 <div class="mt-6 flex flex-col sm:flex-row gap-4">
                     <button id="submit-all-btn" class="w-full sm:w-auto flex-grow py-3 px-5 bg-gradient-to-br from-blue-500 to-indigo-600 text-white font-semibold rounded-lg shadow-md hover:from-blue-600 hover:to-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-opacity-75 transition-all transform hover:scale-105">
                         Submit All Gigs
@@ -431,77 +443,340 @@
         // --- API Keys & URLs ---
         const GIG_ENTRY_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwis1FuC0oaT36VeTcsTixxfup2Nhf3pB_U2-Hnl3HGTw0ms5pZdC9h5pPD6UDpe_nv/exec";
 
-        // --- State Variables ---
+        // --- DOM Elements ---
         const gigForm = document.getElementById('gig-entry-form');
         const loadingOverlay = document.getElementById('loadingOverlay');
         const customAlert = document.getElementById('customAlert');
+        const addToListBtn = document.getElementById('add-gig-to-list-btn');
+        const cancelEditBtn = document.getElementById('cancel-edit-btn');
+        const addGigText = document.getElementById('add-gig-text');
+        const addGigIcon = document.getElementById('add-gig-icon');
+        const submitAllBtn = document.getElementById('submit-all-btn');
+        const clearListBtn = document.getElementById('clear-list-btn');
+        const stagedGigsContainer = document.getElementById('staged-gigs-container');
+        const stagedGigsList = document.getElementById('staged-gigs-list');
+
+        // --- State Variables ---
         let alertTimeout;
         let userIP = null;
         let stagedGigs = [];
-        let venueCache = []; // This will hold the FULL venue list for instant local search.
+        let venueCache = [];
+        let editingGigIndex = null; // null when adding, number (index) when editing
 
-        // --- Custom Alert Function (condensed) ---
+        // --- Custom Alert Function ---
         const showCustomAlert = (message, isError = false, duration = 4000) => { clearTimeout(alertTimeout); const alertBox = document.createElement('div'); alertBox.className = 'custom-alert-box'; alertBox.textContent = message; if (isError) { alertBox.style.background = 'linear-gradient(135deg, #ef4444, #dc2626)'; } customAlert.innerHTML = ''; customAlert.appendChild(alertBox); alertTimeout = setTimeout(() => { alertBox.classList.add('fade-out'); alertBox.addEventListener('animationend', () => customAlert.contains(alertBox) && customAlert.removeChild(alertBox)); }, duration); };
         
         // --- IP Geolocation Logic ---
         const getUserIP = () => { fetch('https://api.ipify.org?format=json').then(response => response.json()).then(data => { userIP = data.ip; }).catch(error => { console.warn('Could not fetch IP address.', error); }); };
 
-        // --- Gig List Management (condensed)---
-        const addToListBtn = document.getElementById('add-gig-to-list-btn'); const submitAllBtn = document.getElementById('submit-all-btn'); const clearListBtn = document.getElementById('clear-list-btn'); const stagedGigsContainer = document.getElementById('staged-gigs-container'); const stagedGigsList = document.getElementById('staged-gigs-list');
-        const renderStagedGigs = () => { stagedGigsList.innerHTML = ''; if (stagedGigs.length === 0) { stagedGigsContainer.classList.add('hidden'); return; } stagedGigsContainer.classList.remove('hidden'); submitAllBtn.textContent = `Submit ${stagedGigs.length} Gig(s)`; stagedGigs.forEach((gig, index) => { const gigElement = document.createElement('div'); gigElement.className = 'bg-slate-50 p-4 rounded-lg border border-slate-200 flex items-center justify-between'; gigElement.innerHTML = `<div><p class="font-semibold text-slate-800">${gig['Venue Name']}</p><p class="text-sm text-slate-600">${gig['Address']}</p><p class="text-sm text-slate-500 mt-1">${gig['Date']} at ${gig['Time']}</p></div><button data-index="${index}" class="remove-gig-btn text-red-500 hover:text-red-700 transition-colors p-2"><i class="fas fa-trash-alt fa-lg"></i></button>`; stagedGigsList.appendChild(gigElement); }); };
-        const partialResetForm = () => { const keepVenue = document.getElementById('keep-venue-info').checked; const keepTime = document.getElementById('keep-time').checked; if (!keepVenue) { ['venue-name', 'venue-address', 'venue-website', 'venue-phone', 'venue-email'].forEach(id => document.getElementById(id).value = ''); } if (!keepTime) { document.getElementById('gig-time').value = ''; document.getElementById('gig-time-display').textContent = 'Select a time...'; } document.getElementById('gig-date').value = ''; document.getElementById('gig-date-display').textContent = 'Select a date...'; gigForm.querySelectorAll('[required]').forEach(field => { if (field.id !== 'band-name') { const targetEl = document.getElementById(`${field.id}-display`) || field; targetEl.classList.remove('border-red-500', 'ring-red-500'); } }); if (!keepVenue) document.getElementById('venue-name').focus(); else document.getElementById('gig-date-display').focus(); };
-        addToListBtn.addEventListener('click', () => { let firstInvalidField = null, isValid = true; gigForm.querySelectorAll('[required]').forEach(field => { const targetEl = document.getElementById(`${field.id}-display`) || field; if (!field.value.trim()) { targetEl.classList.add('border-red-500', 'ring-red-500'); if (!firstInvalidField) firstInvalidField = targetEl; isValid = false; } else { targetEl.classList.remove('border-red-500', 'ring-red-500'); } }); if (!isValid) { showCustomAlert('Please fill out all required fields.', true); firstInvalidField.focus(); return; } const gigData = { 'Name': document.getElementById('band-name').value.trim(), 'Band Website': document.getElementById('band-website').value.trim(), 'Band Email': document.getElementById('band-email').value.trim(), 'Venue Name': document.getElementById('venue-name').value.trim(), 'Address': document.getElementById('venue-address').value.trim(), 'Venue Website': document.getElementById('venue-website').value.trim(), 'Venue Phone Number': document.getElementById('venue-phone').value.trim(), 'Venue Email': document.getElementById('venue-email').value.trim(), 'Date': document.getElementById('gig-date').value, 'Time': document.getElementById('gig-time').value }; stagedGigs.push(gigData); showCustomAlert('Gig added to the list!'); renderStagedGigs(); partialResetForm(); });
-        stagedGigsList.addEventListener('click', (e) => { const removeBtn = e.target.closest('.remove-gig-btn'); if (removeBtn) { stagedGigs.splice(parseInt(removeBtn.dataset.index, 10), 1); renderStagedGigs(); showCustomAlert('Gig removed from the list.'); } });
-        submitAllBtn.addEventListener('click', () => { if (stagedGigs.length === 0) return showCustomAlert('There are no gigs in the list to submit.', true); submitAllBtn.disabled = true; submitAllBtn.textContent = 'Submitting...'; fetch(GIG_ENTRY_SCRIPT_URL, { method: 'POST', body: JSON.stringify(stagedGigs), headers: { 'Content-Type': 'text/plain;charset=utf-8' } }).then(res => res.ok ? res.json() : Promise.reject(`Network error: ${res.statusText}`)).then(data => { if (data.result !== 'success') throw new Error(data.error || 'Unknown script error.'); gigForm.reset(); partialResetForm(); stagedGigs = []; renderStagedGigs(); showCustomAlert(`${data.count || 'All'} gigs added successfully!`); }).catch(error => { showCustomAlert(`Error: ${error.message}`, true); }).finally(() => { submitAllBtn.disabled = false; renderStagedGigs(); }); });
-        clearListBtn.addEventListener('click', () => { if (stagedGigs.length > 0) { stagedGigs = []; renderStagedGigs(); showCustomAlert('List cleared.', false, 2000); } });
+        // --- Gig List Management & Edit Mode ---
+        const renderStagedGigs = () => {
+            stagedGigsList.innerHTML = '';
+            if (stagedGigs.length === 0) {
+                stagedGigsContainer.classList.add('hidden');
+                return;
+            }
+            stagedGigsContainer.classList.remove('hidden');
+            submitAllBtn.textContent = `Submit ${stagedGigs.length} Gig(s)`;
+            stagedGigs.forEach((gig, index) => {
+                const isEditing = index === editingGigIndex;
+                const gigCard = document.createElement('div');
+                
+                // **FIX**: Format date to MM/DD/YYYY
+                const dateObj = new Date(gig['Date'] + 'T00:00:00');
+                const formattedDate = dateObj.toLocaleDateString('en-US', {
+                    month: '2-digit',
+                    day: '2-digit',
+                    year: 'numeric'
+                });
 
-        // --- Intelligent search logic (condensed) ---
-        const normalizeString = (str) => !str ? '' : str.toLowerCase().replace(/\b(the|a|an)\b/g, '').replace(/[\s\W_]+/g, '');
+                gigCard.className = `bg-white p-4 rounded-xl border border-slate-200 shadow-sm transition-all duration-300 ${isEditing ? 'ring-2 ring-indigo-500 ring-offset-2' : ''}`;
+                gigCard.innerHTML = `
+                    <div class="flex justify-between items-start gap-4">
+                        <div>
+                            <p class="font-bold text-lg text-slate-800">${gig['Name']}</p>
+                            <p class="font-semibold text-md text-indigo-700 mt-1">${gig['Venue Name']}</p>
+                            <p class="text-sm text-slate-600">${gig['Address']}</p>
+                            <p class="text-sm text-slate-500 mt-2 font-medium bg-slate-100 inline-block px-2 py-1 rounded-md">${formattedDate} at ${gig['Time']}</p>
+                        </div>
+                        <div class="flex flex-col sm:flex-row gap-2 flex-shrink-0">
+                            <button data-index="${index}" class="edit-gig-btn text-slate-500 hover:text-indigo-600 transition-colors p-2 rounded-lg hover:bg-slate-100"><i class="fas fa-pencil-alt fa-lg"></i></button>
+                            <button data-index="${index}" class="remove-gig-btn text-slate-500 hover:text-red-600 transition-colors p-2 rounded-lg hover:bg-slate-100"><i class="fas fa-trash-alt fa-lg"></i></button>
+                        </div>
+                    </div>
+                `;
+                stagedGigsList.appendChild(gigCard);
+            });
+        };
+
+        const partialResetForm = () => {
+            const keepVenue = document.getElementById('keep-venue-info').checked;
+            const keepTime = document.getElementById('keep-time').checked;
+            if (!keepVenue) {
+                ['venue-name', 'venue-address', 'venue-website', 'venue-phone', 'venue-email'].forEach(id => document.getElementById(id).value = '');
+            }
+            if (!keepTime) {
+                document.getElementById('gig-time').value = '';
+                document.getElementById('gig-time-display').textContent = 'Select a time...';
+            }
+            document.getElementById('gig-date').value = '';
+            document.getElementById('gig-date-display').textContent = 'Select a date...';
+            gigForm.querySelectorAll('[required]').forEach(field => {
+                if (field.id !== 'band-name') { // Keep band name unless fully resetting
+                    const targetEl = document.getElementById(`${field.id}-display`) || field;
+                    targetEl.classList.remove('border-red-500', 'ring-red-500');
+                }
+            });
+            if (!keepVenue) document.getElementById('venue-name').focus();
+            else document.getElementById('gig-date-display').focus();
+        };
+
+        const exitEditMode = (resetForm = true) => {
+            editingGigIndex = null;
+            addGigText.textContent = 'Add Gig to List';
+            addGigIcon.className = 'fas fa-plus mr-2';
+            addToListBtn.classList.remove('bg-indigo-600', 'hover:bg-indigo-700', 'focus:ring-indigo-500');
+            addToListBtn.classList.add('bg-slate-600', 'hover:bg-slate-700', 'focus:ring-slate-500');
+            cancelEditBtn.classList.add('hidden');
+            if (resetForm) partialResetForm();
+            renderStagedGigs(); // Re-render to remove highlight
+        };
+
+        const enterEditMode = (index) => {
+            const gig = stagedGigs[index];
+            if (!gig) return;
+
+            // Populate form
+            document.getElementById('band-name').value = gig['Name'];
+            document.getElementById('band-website').value = gig['Band Website'];
+            document.getElementById('band-email').value = gig['Band Email'];
+            document.getElementById('venue-name').value = gig['Venue Name'];
+            document.getElementById('venue-address').value = gig['Address'];
+            document.getElementById('venue-website').value = gig['Venue Website'];
+            document.getElementById('venue-phone').value = gig['Venue Phone Number'];
+            document.getElementById('venue-email').value = gig['Venue Email'];
+            document.getElementById('gig-date').value = gig['Date'];
+            document.getElementById('gig-date-display').textContent = new Date(gig['Date'] + 'T00:00:00').toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+            document.getElementById('gig-time').value = gig['Time'];
+            document.getElementById('gig-time-display').textContent = gig['Time'];
+
+            // Update UI for editing state
+            editingGigIndex = index;
+            addGigText.textContent = 'Update Gig in List';
+            addGigIcon.className = 'fas fa-check-circle mr-2';
+            addToListBtn.classList.remove('bg-slate-600', 'hover:bg-slate-700', 'focus:ring-slate-500');
+            addToListBtn.classList.add('bg-indigo-600', 'hover:bg-indigo-700', 'focus:ring-indigo-500');
+            cancelEditBtn.classList.remove('hidden');
+            
+            renderStagedGigs(); // Re-render to highlight the editing card
+            document.getElementById('form-section').scrollIntoView({ behavior: 'smooth' });
+        };
+        
+        addToListBtn.addEventListener('click', () => {
+            let firstInvalidField = null, isValid = true;
+            gigForm.querySelectorAll('[required]').forEach(field => {
+                const targetEl = document.getElementById(`${field.id}-display`) || field;
+                if (!field.value.trim()) {
+                    targetEl.classList.add('border-red-500', 'ring-red-500');
+                    if (!firstInvalidField) firstInvalidField = targetEl;
+                    isValid = false;
+                } else {
+                    targetEl.classList.remove('border-red-500', 'ring-red-500');
+                }
+            });
+            if (!isValid) {
+                showCustomAlert('Please fill out all required fields.', true);
+                firstInvalidField.focus();
+                return;
+            }
+            const gigData = {
+                'Name': document.getElementById('band-name').value.trim(),
+                'Band Website': document.getElementById('band-website').value.trim(),
+                'Band Email': document.getElementById('band-email').value.trim(),
+                'Venue Name': document.getElementById('venue-name').value.trim(),
+                'Address': document.getElementById('venue-address').value.trim(),
+                'Venue Website': document.getElementById('venue-website').value.trim(),
+                'Venue Phone Number': document.getElementById('venue-phone').value.trim(),
+                'Venue Email': document.getElementById('venue-email').value.trim(),
+                'Date': document.getElementById('gig-date').value,
+                'Time': document.getElementById('gig-time').value
+            };
+
+            if (editingGigIndex !== null) {
+                stagedGigs[editingGigIndex] = gigData;
+                showCustomAlert('Gig updated in the list!');
+                exitEditMode();
+            } else {
+                stagedGigs.push(gigData);
+                showCustomAlert('Gig added to the list!');
+                renderStagedGigs();
+                partialResetForm();
+            }
+
+            // **FIX**: Scroll to the staged gigs list after adding/updating
+            if (stagedGigs.length > 0) {
+                setTimeout(() => {
+                    stagedGigsContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }, 100);
+            }
+        });
+
+        cancelEditBtn.addEventListener('click', () => {
+            exitEditMode();
+            showCustomAlert('Edit cancelled.', false, 2000);
+        });
+
+        stagedGigsList.addEventListener('click', (e) => {
+            const targetButton = e.target.closest('button');
+            if (!targetButton) return;
+            
+            const index = parseInt(targetButton.dataset.index, 10);
+            
+            if (targetButton.classList.contains('remove-gig-btn')) {
+                stagedGigs.splice(index, 1);
+                if(editingGigIndex === index) {
+                    exitEditMode();
+                } else {
+                    if (editingGigIndex !== null && index < editingGigIndex) {
+                        editingGigIndex--;
+                    }
+                    renderStagedGigs();
+                }
+                showCustomAlert('Gig removed from the list.');
+            } else if (targetButton.classList.contains('edit-gig-btn')) {
+                enterEditMode(index);
+            }
+        });
+
+        submitAllBtn.addEventListener('click', () => {
+            if (stagedGigs.length === 0) return showCustomAlert('There are no gigs in the list to submit.', true);
+            submitAllBtn.disabled = true;
+            submitAllBtn.textContent = 'Submitting...';
+            fetch(GIG_ENTRY_SCRIPT_URL, {
+                method: 'POST',
+                body: JSON.stringify(stagedGigs),
+                headers: { 'Content-Type': 'text/plain;charset=utf-8' }
+            }).then(res => res.ok ? res.json() : Promise.reject(`Network error: ${res.statusText}`))
+            .then(data => {
+                if (data.result !== 'success') throw new Error(data.error || 'Unknown script error.');
+                gigForm.reset();
+                exitEditMode(false);
+                stagedGigs = [];
+                renderStagedGigs();
+                showCustomAlert(`${data.count || 'All'} gigs added successfully!`);
+            }).catch(error => {
+                showCustomAlert(`Error: ${error.message}`, true);
+            }).finally(() => {
+                submitAllBtn.disabled = false;
+                renderStagedGigs();
+            });
+        });
+
+        clearListBtn.addEventListener('click', () => {
+            if (stagedGigs.length > 0) {
+                stagedGigs = [];
+                exitEditMode();
+                renderStagedGigs();
+                showCustomAlert('List cleared.', false, 2000);
+            }
+        });
+
+        // --- Venue Memory (Client-Side Search) ---
+        const normalizeString = (str) => {
+            if (!str) return '';
+            return str.toLowerCase().replace(/\b(the|a|an)\b/g, '').replace(/[\s\W_]+/g, '');
+        };
         const venueInput = document.getElementById('venue-name');
         const venueSuggestionsContainer = document.getElementById('venue-suggestions');
-        const fetchVenues = () => { fetch(`${GIG_ENTRY_SCRIPT_URL}?action=getVenues`).then(res => res.ok ? res.json() : Promise.reject('Failed to fetch venues.')).then(json => { if (json.result === 'success') { venueCache = json.data; console.log(`✅ Instantly ready with ${venueCache.length} cached venues.`); } else { throw new Error(json.error); } }).catch(error => console.error('❌ Could not fetch venue list:', error)); };
-        venueInput.addEventListener('input', () => { const query = venueInput.value; venueSuggestionsContainer.innerHTML = ''; if (query.length < 2 || venueCache.length === 0) { venueSuggestionsContainer.classList.add('hidden'); return; } const normalizedQuery = normalizeString(query); const filteredVenues = venueCache.filter(venue => normalizeString(venue.name).includes(normalizedQuery)).slice(0, 7); if (filteredVenues.length > 0) { filteredVenues.forEach(venue => { const suggestionDiv = document.createElement('div'); suggestionDiv.innerHTML = `<div class="font-medium text-slate-800">${venue.name}</div><div class="text-sm text-slate-500">${venue.address}</div>`; suggestionDiv.className = 'px-4 py-2 hover:bg-slate-100 cursor-pointer border-b border-slate-100 last:border-b-0'; suggestionDiv.addEventListener('click', () => { document.getElementById('venue-name').value = venue.name || ''; document.getElementById('venue-address').value = venue.address || ''; document.getElementById('venue-website').value = venue.website || ''; document.getElementById('venue-phone').value = venue.phone || ''; document.getElementById('venue-email').value = venue.email || ''; venueSuggestionsContainer.classList.add('hidden'); document.getElementById('gig-date-display').focus(); }); venueSuggestionsContainer.appendChild(suggestionDiv); }); venueSuggestionsContainer.classList.remove('hidden'); } else { venueSuggestionsContainer.classList.add('hidden'); } });
-        document.addEventListener('click', (e) => { if (!document.getElementById('venue-container').contains(e.target)) venueSuggestionsContainer.classList.add('hidden'); });
+        const fetchVenues = () => {
+            fetch(`${GIG_ENTRY_SCRIPT_URL}?action=getVenues`)
+                .then(res => res.ok ? res.json() : Promise.reject('Failed to fetch venues.'))
+                .then(json => {
+                    if (json.result === 'success') {
+                        venueCache = json.data;
+                        console.log(`✅ Instantly ready with ${venueCache.length} cached venues.`);
+                    } else { throw new Error(json.error); }
+                }).catch(error => { console.error('❌ Could not fetch venue list for autocomplete:', error); });
+        };
+        venueInput.addEventListener('input', () => {
+            const query = venueInput.value;
+            venueSuggestionsContainer.innerHTML = '';
+            if (query.length < 2 || venueCache.length === 0) {
+                venueSuggestionsContainer.classList.add('hidden');
+                return;
+            }
+            const normalizedQuery = normalizeString(query);
+            const filteredVenues = venueCache.filter(venue => {
+                const normalizedVenueName = normalizeString(venue.name);
+                return normalizedVenueName.includes(normalizedQuery);
+            }).slice(0, 7);
+            if (filteredVenues.length > 0) {
+                filteredVenues.forEach(venue => {
+                    const suggestionDiv = document.createElement('div');
+                    suggestionDiv.innerHTML = `<div class="font-medium text-slate-800">${venue.name}</div><div class="text-sm text-slate-500">${venue.address}</div>`;
+                    suggestionDiv.className = 'px-4 py-2 hover:bg-slate-100 cursor-pointer border-b border-slate-100 last:border-b-0';
+                    suggestionDiv.addEventListener('click', () => {
+                        document.getElementById('venue-name').value = venue.name || '';
+                        document.getElementById('venue-address').value = venue.address || '';
+                        document.getElementById('venue-website').value = venue.website || '';
+                        document.getElementById('venue-phone').value = venue.phone || '';
+                        document.getElementById('venue-email').value = venue.email || '';
+                        venueSuggestionsContainer.classList.add('hidden');
+                        document.getElementById('gig-date-display').focus();
+                    });
+                    venueSuggestionsContainer.appendChild(suggestionDiv);
+                });
+                venueSuggestionsContainer.classList.remove('hidden');
+            } else {
+                venueSuggestionsContainer.classList.add('hidden');
+            }
+        });
+        document.addEventListener('click', (e) => {
+            if (!document.getElementById('venue-container').contains(e.target)) {
+                venueSuggestionsContainer.classList.add('hidden');
+            }
+        });
 
-        // --- MODIFIED: Address Autocomplete with Skeleton Loader and 20ms Delay ---
+        // --- Address (Geoapify) Autocomplete Logic ---
         const addressInput = document.getElementById('venue-address');
         const addressSuggestionsContainer = document.getElementById('address-suggestions');
         let addressDebounceTimer;
         let addressAbortController;
-
+        let skeletonTimer;
         addressInput.addEventListener('input', () => {
             clearTimeout(addressDebounceTimer);
+            clearTimeout(skeletonTimer);
             const query = addressInput.value;
             if (addressAbortController) { addressAbortController.abort(); }
-            
             if (query.length < 3) {
                 addressSuggestionsContainer.classList.add('hidden');
                 return;
             }
-
             addressDebounceTimer = setTimeout(() => {
-                // Show skeleton loader
-                addressSuggestionsContainer.innerHTML = `
-                    <div class="skeleton-item"><div class="skeleton-line long"></div><div class="skeleton-line short"></div></div>
-                    <div class="skeleton-item"><div class="skeleton-line long"></div><div class="skeleton-line short"></div></div>
-                    <div class="skeleton-item"><div class="skeleton-line long"></div><div class="skeleton-line short"></div></div>
-                `;
-                addressSuggestionsContainer.classList.remove('hidden');
-
                 addressAbortController = new AbortController();
+                skeletonTimer = setTimeout(() => {
+                    let skeletonHTML = '';
+                    for (let i = 0; i < 3; i++) {
+                        skeletonHTML += `<div class="skeleton-suggestion"><div class="skeleton-line primary"></div><div class="skeleton-line secondary"></div></div>`;
+                    }
+                    addressSuggestionsContainer.innerHTML = skeletonHTML;
+                    addressSuggestionsContainer.classList.remove('hidden');
+                }, 250);
                 const url = `${GIG_ENTRY_SCRIPT_URL}?action=autocompleteAddress&query=${encodeURIComponent(query)}&ip=${userIP || ''}`;
-                
                 fetch(url, { signal: addressAbortController.signal })
                     .then(response => response.ok ? response.json() : Promise.reject(`Address lookup failed`))
                     .then(data => {
-                        addressSuggestionsContainer.innerHTML = ''; // Clear skeletons
+                        clearTimeout(skeletonTimer);
+                        addressSuggestionsContainer.innerHTML = '';
                         if (data.features && data.features.length > 0) {
                             data.features.forEach(feature => {
                                 const props = feature.properties;
-                                if (props.address_line1 && props.address_line2) {
+                                const primaryText = props.address_line1;
+                                const secondaryText = props.address_line2;
+                                if (primaryText && secondaryText) {
                                     const suggestionDiv = document.createElement('div');
                                     suggestionDiv.className = 'px-4 py-2 hover:bg-slate-100 cursor-pointer border-b border-slate-100 last:border-b-0';
-                                    suggestionDiv.innerHTML = `<div class="font-medium text-slate-800">${props.address_line1}</div><div class="text-sm text-slate-500">${props.address_line2}</div>`;
+                                    suggestionDiv.innerHTML = `<div class="font-medium text-slate-800">${primaryText}</div><div class="text-sm text-slate-500">${secondaryText}</div>`;
                                     suggestionDiv.addEventListener('click', () => {
                                         addressInput.value = props.formatted;
                                         addressSuggestionsContainer.classList.add('hidden');
@@ -509,21 +784,21 @@
                                     addressSuggestionsContainer.appendChild(suggestionDiv);
                                 }
                             });
-                        }
-                        if (addressSuggestionsContainer.childElementCount === 0) {
+                            if (addressSuggestionsContainer.childElementCount > 0) {
+                                addressSuggestionsContainer.classList.remove('hidden');
+                            } else {
+                                addressSuggestionsContainer.classList.add('hidden');
+                            }
+                        } else {
                             addressSuggestionsContainer.classList.add('hidden');
                         }
-                    })
-                    .catch(error => {
-                        if (error.name !== 'AbortError') {
-                            console.error('Address lookup fetch failed:', error);
-                            addressSuggestionsContainer.innerHTML = '';
-                            addressSuggestionsContainer.classList.add('hidden');
-                        }
+                    }).catch(error => {
+                        clearTimeout(skeletonTimer);
+                        addressSuggestionsContainer.classList.add('hidden');
+                        if (error.name !== 'AbortError') console.error('Address lookup fetch failed:', error);
                     });
-            }, 20); // <-- Delay set to 20ms
+            }, 150);
         });
-        
         document.addEventListener('click', (e) => {
             if (!document.getElementById('address-container').contains(e.target)) {
                 addressSuggestionsContainer.classList.add('hidden');
@@ -546,16 +821,7 @@
         document.addEventListener('click', (e) => { if (!contactMenu.classList.contains('hidden') && !menuButton.contains(e.target)) { contactMenu.classList.add('hidden'); hamburgerIcon.classList.remove('open'); } });
 
         // --- App Initialization ---
-        const initializeApp = () => {
-            getUserIP();
-            fetchVenues();
-            buildCalendar(calendarDate.getFullYear(), calendarDate.getMonth());
-            const minDelayPromise = new Promise(resolve => setTimeout(resolve, 500));
-            minDelayPromise.then(() => {
-                loadingOverlay.style.opacity = '0';
-                setTimeout(() => { loadingOverlay.style.display = "none"; }, 500);
-            });
-        };
+        const initializeApp = () => { getUserIP(); fetchVenues(); buildCalendar(calendarDate.getFullYear(), calendarDate.getMonth()); const minDelayPromise = new Promise(resolve => setTimeout(resolve, 500)); minDelayPromise.then(() => { loadingOverlay.style.opacity = '0'; setTimeout(() => { loadingOverlay.style.display = "none"; }, 500); }); };
         initializeApp();
     });
 </script>
