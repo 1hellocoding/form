@@ -50,6 +50,7 @@
             padding-top: var(--safe-top);
             padding-left: var(--safe-left);
             padding-right: var(--safe-right);
+            scroll-behavior: smooth;
         }
 
         /* Custom alert styling */
@@ -303,20 +304,29 @@
                         <div class="pt-2">
                             <h3 class="text-base font-semibold text-slate-800 mb-3">Autofill Options</h3>
                             <div class="flex items-center space-x-6 bg-slate-50 p-3 rounded-lg border border-slate-200">
-                                <label for="keep-venue-info" class="flex items-center cursor-pointer">
-                                    <input type="checkbox" id="keep-venue-info" class="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500">
-                                    <span class="ml-2 text-sm text-slate-700 font-medium">Keep Venue Info</span>
+                                <label for="keep-venue-info" class="flex items-center cursor-pointer select-none">
+                                    <div class="relative">
+                                        <input type="checkbox" id="keep-venue-info" class="sr-only peer">
+                                        <div class="block w-11 h-6 bg-slate-300 rounded-full transition-colors duration-300 ease-in-out peer-checked:bg-indigo-500"></div>
+                                        <div class="absolute left-1 top-1 bg-white w-4 h-4 rounded-full transition-transform duration-300 ease-in-out transform peer-checked:translate-x-5"></div>
+                                    </div>
+                                    <span class="ml-3 text-sm font-medium text-slate-700">Keep Venue Info</span>
                                 </label>
-                                <label for="keep-time" class="flex items-center cursor-pointer">
-                                    <input type="checkbox" id="keep-time" class="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500">
-                                    <span class="ml-2 text-sm text-slate-700 font-medium">Keep Time</span>
+                                
+                                <label for="keep-time" class="flex items-center cursor-pointer select-none">
+                                    <div class="relative">
+                                        <input type="checkbox" id="keep-time" class="sr-only peer">
+                                        <div class="block w-11 h-6 bg-slate-300 rounded-full transition-colors duration-300 ease-in-out peer-checked:bg-indigo-500"></div>
+                                        <div class="absolute left-1 top-1 bg-white w-4 h-4 rounded-full transition-transform duration-300 ease-in-out transform peer-checked:translate-x-5"></div>
+                                    </div>
+                                    <span class="ml-3 text-sm font-medium text-slate-700">Keep Time</span>
                                 </label>
                             </div>
                         </div>
 
                         <div class="pt-4 space-y-4">
                              <div class="flex flex-col sm:flex-row gap-4">
-                                <button type="button" id="add-gig-to-list-btn" class="w-full flex-grow py-3 px-5 bg-slate-600 text-white font-semibold rounded-lg shadow-md hover:bg-slate-700 focus:outline-none focus:ring-2 focus:ring-slate-500 focus:ring-opacity-75 transition-all transform hover:scale-105 flex items-center justify-center">
+                                <button type="button" id="add-gig-to-list-btn" class="w-full flex-grow py-3 px-5 bg-indigo-600 text-white font-semibold rounded-lg shadow-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-opacity-75 transition-all transform hover:scale-105 flex items-center justify-center">
                                     <i id="add-gig-icon" class="fas fa-plus mr-2"></i> <span id="add-gig-text">Add Gig to List</span>
                                 </button>
                                 <button type="button" id="cancel-edit-btn" class="w-full sm:w-auto hidden py-3 px-5 bg-gray-200 text-slate-700 font-semibold rounded-lg hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-400 transition-all">
@@ -534,8 +544,6 @@
             editingGigIndex = null;
             addGigText.textContent = 'Add Gig to List';
             addGigIcon.className = 'fas fa-plus mr-2';
-            addToListBtn.classList.remove('bg-indigo-600', 'hover:bg-indigo-700', 'focus:ring-indigo-500');
-            addToListBtn.classList.add('bg-slate-600', 'hover:bg-slate-700', 'focus:ring-slate-500');
             cancelEditBtn.classList.add('hidden');
             if (resetForm) partialResetForm();
             renderStagedGigs();
@@ -561,8 +569,6 @@
             editingGigIndex = index;
             addGigText.textContent = 'Update Gig in List';
             addGigIcon.className = 'fas fa-check-circle mr-2';
-            addToListBtn.classList.remove('bg-slate-600', 'hover:bg-slate-700', 'focus:ring-slate-500');
-            addToListBtn.classList.add('bg-indigo-600', 'hover:bg-indigo-700', 'focus:ring-indigo-500');
             cancelEditBtn.classList.remove('hidden');
             
             renderStagedGigs();
@@ -613,7 +619,7 @@
             if (stagedGigs.length > 0) {
                 setTimeout(() => {
                     stagedGigsContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                }, 10);
+                }, 100);
             }
         });
 
@@ -757,7 +763,7 @@
                     }
                     addressSuggestionsContainer.innerHTML = skeletonHTML;
                     addressSuggestionsContainer.classList.remove('hidden');
-                }, 10);
+                }, 150);
                 const url = `${GIG_ENTRY_SCRIPT_URL}?action=autocompleteAddress&query=${encodeURIComponent(query)}&ip=${userIP || ''}`;
                 fetch(url, { signal: addressAbortController.signal })
                     .then(response => response.ok ? response.json() : Promise.reject(`Address lookup failed`))
@@ -793,7 +799,7 @@
                         addressSuggestionsContainer.classList.add('hidden');
                         if (error.name !== 'AbortError') console.error('Address lookup fetch failed:', error);
                     });
-            }, 10);
+            }, 300);
         });
         document.addEventListener('click', (e) => {
             if (!document.getElementById('address-container').contains(e.target)) {
